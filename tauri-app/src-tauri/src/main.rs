@@ -154,20 +154,31 @@ fn main() {
             // user's machine doesn't need a Python install.
             // Dev fallback: if no sidecar (running cargo run / bun
             // tauri dev), shell out to system Python.
-            let client = match resolve_sidecar_path(&app.handle()) {
-                Some(path) => RpcClient::spawn_sidecar(&path),
-                None => {
-                    eprintln!(
-                        "[RecordorAI] No sidecar found — falling back to \
-                         system Python (dev mode). Run `python \
-                         packaging/build_sidecar.py` to bundle the \
-                         frozen Python."
-                    );
-                    RpcClient::spawn_python()
+            //
+            // RpcClient uses tokio::process::Command which requires
+            // an active Tokio runtime. Tauri's setup callback runs
+            // inside the AppKit/NSApp main loop *before* the Tokio
+            // runtime is available, so we explicitly enter Tauri's
+            // own async runtime via block_on() to perform the spawn.
+            // Without this, tokio panics with "there is no reactor
+            // running" the moment RpcClient::wrap_child calls
+            // .spawn() on the tokio::process::Command.
+            let client_result = tauri::async_runtime::block_on(async {
+                match resolve_sidecar_path(&app.handle()) {
+                    Some(path) => RpcClient::spawn_sidecar(&path),
+                    None => {
+                        eprintln!(
+                            "[RecordorAI] No sidecar found — falling back to \
+                             system Python (dev mode). Run `python \
+                             packaging/build_sidecar.py` to bundle the \
+                             frozen Python."
+                        );
+                        RpcClient::spawn_python()
+                    }
                 }
-            };
+            });
 
-            let client = match client {
+            let client = match client_result {
                 Ok(c) => c,
                 Err(e) => {
                     eprintln!(

@@ -1,0 +1,112 @@
+/* Textual CSS for RecordorAI Installer.
+ *
+ * Single stylesheet shared across all screens — keeps the wizard
+ * visually consistent and lets us re-skin in one place if we want a
+ * dark/light variant later.
+ */
+
+Screen {
+    layout: vertical;
+    background: $surface;
+}
+
+#wizard-header {
+    height: 3;
+    background: $primary;
+    color: $text;
+    text-align: center;
+    padding: 1 0;
+    border-bottom: heavy $primary-lighten-1;
+}
+
+#wizard-body {
+    layout: vertical;
+    padding: 2 4;
+    height: 1fr;
+}
+
+#wizard-footer {
+    height: 3;
+    background: $surface-darken-1;
+    layout: horizontal;
+    padding: 0 2;
+    border-top: heavy $surface-darken-2;
+}
+
+.title {
+    text-style: bold;
+    color: $text;
+    padding-bottom: 1;
+}
+
+.subtitle {
+    color: $text-muted;
+    padding-bottom: 1;
+}
+
+.row {
+    layout: horizontal;
+    height: auto;
+    padding: 1 0;
+}
+
+.col {
+    layout: vertical;
+    height: auto;
+}
+
+Button {
+    margin: 0 1;
+}
+
+Button.primary {
+    background: $accent;
+    color: $text;
+}
+
+Input {
+    margin-top: 1;
+    margin-bottom: 1;
+}
+
+RadioSet, .pick-list {
+    border: solid $primary;
+    padding: 1;
+    margin: 1 0;
+}
+
+ListView {
+    border: solid $primary;
+    height: auto;
+    max-height: 12;
+    margin: 1 0;
+}
+
+.warn {
+    color: $warning;
+}
+
+.ok {
+    color: $success;
+}
+
+.error {
+    color: $error;
+}
+
+.muted {
+    color: $text-muted;
+}
+
+#detection-summary {
+    border: solid $primary;
+    padding: 1 2;
+    margin: 1 0;
+    height: auto;
+}
+
+#progress-log {
+    border: solid $primary;
+    height: 1fr;
+    padding: 1 2;
+}

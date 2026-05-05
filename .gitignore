@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.cache
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tauri build artifacts (Sprint 2+)
+tauri-app/src-tauri/target/
+tauri-app/node_modules/
+tauri-app/dist/
+tauri-app/build/
+
+# Local installer state (test installs)
+.recordorai-installer-state/
+*.installer.log

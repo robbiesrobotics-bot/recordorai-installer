@@ -25,8 +25,13 @@ class TestCli:
         assert "runtimes" in payload
         assert isinstance(payload["runtimes"], list)
 
-    def test_rpc_flag_returns_2_in_sprint_1(self, capsys):
+    def test_rpc_flag_runs_jsonrpc_server_and_exits_on_eof(self, monkeypatch):
+        """``--rpc`` launches the JSON-RPC server. It returns 0 when
+        stdin closes (EOF). Feeding an empty StringIO simulates immediate
+        EOF so the server returns without blocking on real stdin.
+        """
+        import io
+
+        monkeypatch.setattr("sys.stdin", io.StringIO(""))
         rc = main(["--rpc"])
-        err = capsys.readouterr().err
-        assert rc == 2
-        assert "Sprint 2" in err or "RPC" in err
+        assert rc == 0

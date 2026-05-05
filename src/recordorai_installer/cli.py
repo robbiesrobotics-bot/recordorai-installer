@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 
 from .version import __version__
 
@@ -41,8 +40,8 @@ def _build_parser() -> argparse.ArgumentParser:
         "--rpc",
         action="store_true",
         help=(
-            "Run as a JSON-RPC server over stdio (used by the Tauri "
-            "GUI in Sprint 2). No-op in v0.1."
+            "Run as a JSON-RPC 2.0 server over stdio. The Tauri front-end "
+            "spawns this and talks to the same core the TUI uses."
         ),
     )
     return parser
@@ -66,14 +65,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.rpc:
-        # Sprint 2 wires this to a JSON-RPC server. For Sprint 1 we
-        # just print a clear message so the Tauri integration has a
-        # contract to test against.
-        print(
-            "RPC mode is wired in Sprint 2; for now run without --rpc.",
-            file=sys.stderr,
-        )
-        return 2
+        # JSON-RPC 2.0 over stdio — used by the Tauri front-end.
+        from .rpc import run as rpc_run
+
+        return rpc_run()
 
     # Default: launch the TUI wizard.
     from .tui.app import run

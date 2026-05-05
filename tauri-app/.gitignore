@@ -1,0 +1,15 @@
+# SvelteKit
+.svelte-kit/
+build/
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Tauri
+src-tauri/target/
+src-tauri/Cargo.lock
+
+# Editor
+*.log
+*.tsbuildinfo

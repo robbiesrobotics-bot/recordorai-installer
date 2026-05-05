@@ -1,0 +1,27 @@
+[package]
+name = "recordorai-installer-tauri"
+version = "0.1.0"
+description = "RecordorAI Installer — native GUI"
+authors = ["RecordorAI"]
+edition = "2021"
+rust-version = "1.77"
+
+# Single binary, no library crate.
+[[bin]]
+name = "recordorai-installer-tauri"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0", features = [] }
+tauri-plugin-dialog = "2.0"
+tauri-plugin-shell = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

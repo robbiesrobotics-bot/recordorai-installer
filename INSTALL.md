@@ -12,11 +12,17 @@ shipping releases lives in
 | Your OS | Download | Double-click |
 |---|---|---|
 | **macOS (M-series)** | `RecordorAI_Installer_*_aarch64.dmg` | drag the app to Applications, then right-click → Open |
-| **macOS (Intel)** | `RecordorAI_Installer_*_x64.dmg` | same |
+| **macOS (Intel)** | same `aarch64.dmg` | runs via Rosetta 2 (one-click prompt on first launch — see below) |
 | **Windows 10/11** | `RecordorAI_Installer_*_x64-setup.exe` | More info → Run anyway |
 | **Ubuntu/Debian** | `RecordorAI_Installer_*_amd64.deb` | `sudo apt install ./that.deb` |
 | **Fedora/RHEL** | `RecordorAI_Installer-*.x86_64.rpm` | `sudo dnf install ./that.rpm` |
 | **Anything Linux** | `RecordorAI_Installer_*.AppImage` | `chmod +x` and run |
+
+> **Intel Mac users:** v0.1 ships a single arm64 `.dmg`. macOS will
+> prompt to install Rosetta 2 the first time you launch the app
+> (one click, ~30 seconds). Future Intel-native builds will land
+> when the GitHub Actions Intel-Mac runner queue stops being a
+> ~15-minute bottleneck per release.
 
 After install, launch `RecordorAI Installer` from your Apps menu (or
 run `recordorai-install` from a terminal). The wizard walks you

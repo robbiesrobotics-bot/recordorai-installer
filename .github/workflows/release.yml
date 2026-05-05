@@ -206,19 +206,23 @@ jobs:
           TAURI_UPDATER_PUBKEY: ${{ secrets.TAURI_UPDATER_PUBKEY }}
         run: python packaging/inject_signing_config.py
 
-      # ── Build ──────────────────────────────────────────────────────
+      # Notarization-only env (Tauri reads APPLE_ID/PASSWORD/TEAM_ID
+      # directly to drive notarytool). Signing-identity / Windows
+      # cert thumbprint / Tauri updater pubkey are NOT passed via
+      # env — the inject_signing_config.py step above already
+      # patched tauri.conf.json with whatever secrets are present.
+      # Setting them as empty env strings makes Tauri attempt to
+      # sign with "" (keychain miss). Omitting them entirely lets
+      # Tauri's "no-signing" path take over cleanly.
+      #
+      # Apple notarization vars are gated by APPLE_ID being set; if
+      # the secret is empty Tauri's notarization step is skipped.
       - name: Build Tauri bundle
         working-directory: tauri-app
         env:
-          # Sign-time secrets — the Tauri config interpolates these.
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_PROVIDER_SHORT_NAME: ${{ secrets.APPLE_TEAM_ID }}
-          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-          WINDOWS_CERTIFICATE_THUMBPRINT: ${{ secrets.WINDOWS_CERTIFICATE_THUMBPRINT }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: bun x tauri build --target ${{ matrix.tauri_target }}

@@ -16,7 +16,10 @@ use std::sync::Arc;
 
 use rpc::RpcClient;
 use serde_json::Value;
-use tauri::Manager;
+// Tauri 2 split `emit` out of the `Manager` trait into a dedicated
+// `Emitter` trait. We need both: Manager for state(), Emitter for
+// emit() to forward install.event notifications to the SvelteKit UI.
+use tauri::{Emitter, Manager};
 use tokio::sync::Mutex;
 
 // Shared state — single RpcClient instance, locked across commands.

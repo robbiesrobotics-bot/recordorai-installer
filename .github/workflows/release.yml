@@ -161,13 +161,27 @@ jobs:
 
       - name: Install Tauri OS deps (Linux)
         if: runner.os == 'Linux'
+        env:
+          # Belt-and-suspenders: kill any apt prompts so the
+          # runner doesn't wedge on debconf input.
+          DEBIAN_FRONTEND: noninteractive
+          NEEDRESTART_MODE: a
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
+          # Per Tauri 2's docs for ubuntu-24.04:
+          # https://tauri.app/start/prerequisites/#linux
+          # libappindicator3-dev was dropped from ubuntu-24.04;
+          # use libayatana-appindicator3-dev (the maintained fork).
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
             libwebkit2gtk-4.1-dev \
-            libappindicator3-dev \
+            libayatana-appindicator3-dev \
             librsvg2-dev \
-            patchelf
+            patchelf \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libssl-dev
 
       - name: Install front-end deps
         working-directory: tauri-app

@@ -269,12 +269,35 @@ jobs:
           merge-multiple: true
 
       - name: List artifacts
-        run: ls -la artifacts/
+        run: |
+          echo "== artifacts top level =="
+          ls -la artifacts/
+          echo ""
+          echo "== artifacts recursive (the actual files) =="
+          find artifacts -type f -printf "%P\n" | sort
 
+      # Tauri's bundler writes artifacts under bundle-type subdirs
+      # (dmg/, msi/, nsis/, appimage/, deb/, rpm/). actions/upload-artifact
+      # preserves that structure when the path: glob is multi-line, so
+      # after merge-multiple download we get artifacts/<bundle>/files,
+      # not flat. The release glob must be recursive.
       - name: Build updater manifest
+        if: env.TAURI_SIGNING_PRIVATE_KEY != ''
         env:
           TAG: ${{ github.ref_name }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: python packaging/build_updater_manifest.py --tag "$TAG" --artifacts artifacts/ --out latest.json
+
+      - name: Skip updater manifest (no signing key)
+        if: env.TAURI_SIGNING_PRIVATE_KEY == ''
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          echo "TAURI_SIGNING_PRIVATE_KEY not set — skipping updater manifest. The release will publish bundle artifacts only; the auto-updater path activates once the signing key is provisioned."
+          # Touch an empty placeholder so action-gh-release doesn't fail
+          # if asked to upload latest.json. Existing-installs see
+          # 'no update available' which is the correct behavior.
+          rm -f latest.json
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -283,6 +306,18 @@ jobs:
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
           generate_release_notes: true
+          # `*.app.tar.gz*` and `*.nsis.zip*` only get produced when
+          # the Tauri signing key is provisioned (updater format).
+          # latest.json same. Keep fail_on_unmatched_files=false so
+          # unsigned RC builds don't error on absent updater files.
+          fail_on_unmatched_files: false
           files: |
-            artifacts/*
+            artifacts/**/*.dmg
+            artifacts/**/*.msi
+            artifacts/**/*-setup.exe
+            artifacts/**/*.deb
+            artifacts/**/*.rpm
+            artifacts/**/*.AppImage
+            artifacts/**/*.app.tar.gz*
+            artifacts/**/*.nsis.zip*
             latest.json

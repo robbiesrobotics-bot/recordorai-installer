@@ -26,9 +26,26 @@ class WelcomeScreen(Screen):
         self.state = state
 
     def compose(self) -> ComposeResult:
+        from ...version import __version__, is_preview_build
+
         yield Static("RecordorAI Installer", id="wizard-header")
         with Vertical(id="wizard-body"):
             yield Static("Welcome", classes="title")
+
+            # Pre-release banner — shown until v1.0 GA when builds
+            # are signed + notarized. The user already saw the
+            # OS-level warning on launch; this just explains it.
+            if is_preview_build():
+                yield Static(
+                    f"Preview build {__version__} — installers are unsigned "
+                    "while we wait on Apple Developer ID + Windows codesigning "
+                    "paperwork. The OS-level warning you saw on launch is "
+                    "expected. The Tauri auto-updater's Ed25519 signature is "
+                    "always on, so future updates remain tamper-checked.",
+                    classes="warn",
+                    id="preview-banner",
+                )
+
             yield Static(
                 "We're going to set up RecordorAI on this machine. Here's what we found:",
                 classes="subtitle",

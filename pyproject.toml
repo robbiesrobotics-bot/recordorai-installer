@@ -1,6 +1,6 @@
 [project]
 name = "recordorai-installer"
-version = "0.1.0"
+version = "0.1.0rc1"
 description = "Cross-platform installer + integration wizard for RecordorAI"
 authors = [{ name = "RecordorAI", email = "noreply@recordorai.com" }]
 license = "MIT"

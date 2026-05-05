@@ -171,6 +171,24 @@ def clear_cache() -> None:
 # ──────────────────────────────────────────────────────────────────────────
 
 
+def _default_client() -> LicenseClient:
+    """Pick the configured license-client backend.
+
+    Honours ``RECORDORAI_LICENSE_BACKEND`` (lemonsqueezy / keygen /
+    generic), falling back to lemonsqueezy.
+
+    Tests that don't want a real network round-trip pass
+    ``client=StubLicenseClient()`` to :func:`validate_online`
+    directly.
+    """
+    # Local import — keeps the license module importable in
+    # environments that don't have httpx (TUI start-up shouldn't
+    # require it just to read the cached status).
+    from .license_clients import get_client
+
+    return get_client()
+
+
 def validate_online(
     license_key: str,
     *,
@@ -182,7 +200,7 @@ def validate_online(
     Returns the resulting :class:`LicenseStatus`. Doesn't raise —
     network failures fall through to :func:`validate_offline`.
     """
-    client = client or StubLicenseClient()
+    client = client or _default_client()
     try:
         resp = client.check_subscription(license_key)
     except Exception as e:  # noqa: BLE001 — network call may fail any way

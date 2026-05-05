@@ -19,10 +19,20 @@ from recordorai_installer.version import __version__
 
 
 def _server_with_buffers():
-    """Helper: build an RpcServer with in-memory stdin/stdout."""
+    """Helper: build an RpcServer with in-memory stdin/stdout +
+    the StubLicenseClient so license-validation tests don't hit
+    the network. Sprint 5 made LemonSqueezy the default backend;
+    test plumbing pins the stub for hermetic runs.
+    """
+    from recordorai_installer.core.license import StubLicenseClient
+
     stdin = io.StringIO("")
     stdout = io.StringIO()
-    return RpcServer(stdin=stdin, stdout=stdout), stdin, stdout
+    return (
+        RpcServer(stdin=stdin, stdout=stdout, license_client=StubLicenseClient()),
+        stdin,
+        stdout,
+    )
 
 
 def _read_lines(buf: io.StringIO) -> list[dict]:

@@ -44,8 +44,13 @@ class TestStubClient:
 
 
 class TestValidateOnline:
+    """validate_online with an explicit StubLicenseClient — the
+    network-bearing default backend is exercised separately in
+    tests/test_license_clients.py.
+    """
+
     def test_active_key_caches_and_returns_active_state(self):
-        status = lic_mod.validate_online("RAI-PRO-VALID-1234")
+        status = lic_mod.validate_online("RAI-PRO-VALID-1234", client=lic_mod.StubLicenseClient())
         assert status.state == lic_mod.LicenseState.ACTIVE
         assert status.edition == "pro"
         assert status.last_validated_iso is not None
@@ -53,12 +58,12 @@ class TestValidateOnline:
         assert lic_mod._cache_path().exists()
 
     def test_expired_key_does_not_unlock_pro(self):
-        status = lic_mod.validate_online("RAI-PRO-EXPIRED-9999")
+        status = lic_mod.validate_online("RAI-PRO-EXPIRED-9999", client=lic_mod.StubLicenseClient())
         assert status.state == lic_mod.LicenseState.EXPIRED
         assert status.edition == "community"
 
     def test_unknown_key_returns_invalid(self):
-        status = lic_mod.validate_online("garbage")
+        status = lic_mod.validate_online("garbage", client=lic_mod.StubLicenseClient())
         assert status.state == lic_mod.LicenseState.INVALID
         assert status.edition == "community"
 

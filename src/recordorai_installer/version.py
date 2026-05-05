@@ -16,7 +16,7 @@ whether to show the "early access — unsigned binaries" banner on
 the Welcome screen.
 """
 
-__version__ = "0.1.0rc1"
+__version__ = "0.1.0rc2"
 
 
 def is_preview_build() -> bool:

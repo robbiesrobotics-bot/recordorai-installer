@@ -35,7 +35,6 @@ import os
 import sys
 from pathlib import Path
 
-
 CONFIG_PATH = Path("tauri-app/src-tauri/tauri.conf.json")
 
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Hardened Runtime entitlements for the RecordorAI Installer.
+         Apple notarization REQUIRES the Hardened Runtime; we declare
+         only the entitlements we actually need so the binary stays
+         tightly sandboxed.
+
+         The installer spawns the Python sidecar (recordorai-install)
+         which then pip-installs / writes config / talks JSON-RPC over
+         stdio. PyInstaller-frozen Python uses dyld at startup and
+         requires `allow-unsigned-executable-memory` for the embedded
+         interpreter on macOS 11+. -->
+
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+
+    <!-- Allow the bundled Python (sidecar) to import dynamic
+         libraries it ships in its own .dylib bundle. -->
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+
+    <!-- Network: the installer talks to the license server (Lemon
+         Squeezy / Keygen / generic) and may download model artifacts. -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+
+    <!-- File access: the installer writes to the user's home dir
+         (~/.recordorai/), edits OpenClaw configs, drops Hermes plugins,
+         etc. The default Hardened Runtime blocks user-selected files;
+         we don't need that since we're a wizard, not a sandbox app.
+         Notarization works without this entitlement set. -->
+</dict>
+</plist>

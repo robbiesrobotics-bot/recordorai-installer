@@ -28,7 +28,10 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["dmg", "msi", "appimage", "deb", "rpm"],
+    "targets": ["dmg", "msi", "nsis", "appimage", "deb", "rpm"],
+    "externalBin": [
+      "binaries/recordorai-install"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -42,18 +45,40 @@
     "category": "DeveloperTool",
     "macOS": {
       "minimumSystemVersion": "11.0",
-      "frameworks": []
+      "frameworks": [],
+      "signingIdentity": "$APPLE_SIGNING_IDENTITY",
+      "providerShortName": "$APPLE_PROVIDER_SHORT_NAME",
+      "entitlements": "entitlements.plist"
     },
     "windows": {
       "wix": {
         "language": "en-US"
-      }
+      },
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "displayLanguageSelector": false
+      },
+      "certificateThumbprint": "$WINDOWS_CERTIFICATE_THUMBPRINT",
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com"
     },
     "linux": {
       "deb": {
-        "depends": ["python3 (>= 3.9)"]
+        "depends": []
+      },
+      "appimage": {
+        "bundleMediaFramework": false
       }
     }
   },
-  "plugins": {}
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://github.com/RecordorAI/recordorai-installer/releases/latest/download/latest.json"
+      ],
+      "dialog": true,
+      "pubkey": "$TAURI_UPDATER_PUBKEY"
+    }
+  }
 }

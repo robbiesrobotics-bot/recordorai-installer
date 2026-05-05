@@ -41,3 +41,10 @@ tauri-app/build/
 # Local installer state (test installs)
 .recordorai-installer-state/
 *.installer.log
+
+# Sprint 4 — packaging build artifacts (PyInstaller + Tauri sidecar)
+# The sidecar binaries are produced by CI on tag push; we don't
+# commit them. The build/ + dist/ globs above already cover
+# PyInstaller output but be explicit about the staged sidecar dir.
+tauri-app/src-tauri/binaries/
+!tauri-app/src-tauri/binaries/.gitkeep

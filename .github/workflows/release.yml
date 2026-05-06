@@ -206,6 +206,32 @@ jobs:
             -s -k '' build.keychain
           rm /tmp/cert.p12
 
+      # The Cargo cache (actions/cache@v4 above) restores the entire
+      # tauri-app/src-tauri/target/ tree, which includes any
+      # release/bundle/*.{deb,rpm,AppImage,dmg,msi,...} files left
+      # over from the previous run. Tauri's bundler doesn't clean
+      # those out; cargo-deb / cargo-rpm just write new ones next
+      # to the old ones, so our artifact_glob picks up both.
+      #
+      # Caught on rc.2: the rc.1 .deb / .rpm files (from a prior
+      # cache-hit run) ended up attached to the rc.2 release, even
+      # though the rc.2 build only produced 0.1.0-named files.
+      #
+      # Fix: explicitly clean the bundle output dir before tauri
+      # build runs. Cargo's compile cache (target/release/deps,
+      # target/release/incremental) is unaffected — only the bundle
+      # output, which is fast to regenerate, gets wiped.
+      - name: Clean stale bundle artifacts (cache hygiene)
+        shell: bash
+        run: |
+          BUNDLE_DIR="tauri-app/src-tauri/target/${{ matrix.tauri_target }}/release/bundle"
+          if [ -d "$BUNDLE_DIR" ]; then
+            echo "Cleaning stale bundle artifacts under $BUNDLE_DIR/"
+            rm -rf "$BUNDLE_DIR"
+          else
+            echo "No prior $BUNDLE_DIR to clean."
+          fi
+
       # ── Inject signing config (opt-in based on present secrets) ───
       # The base tauri.conf.json ships without signing fields so
       # unsigned dev builds work cleanly. This step writes the
